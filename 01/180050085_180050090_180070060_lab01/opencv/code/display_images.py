@@ -10,10 +10,12 @@ if __name__ == '__main__':
 
 	path = args.path
 
-	imgs = [cv.imread(path+"/display0"+i+".png", 1) for i in range(6)]
-	cv.imshow(imgs[0])
+	imgs = [cv.imread(path+"/display0"+str(i)+".png", 1) for i in range(6)]
+	cv.namedWindow("Display Images")
+	cv.imshow("Display Images", imgs[0])
 
 	key = cv.waitKey(0)
 	while key in [ord('n'), ord('p')]:
 		print("pressed {}".format(key))
 	print("wrong key")
+	cv.destroyAllWindows()
