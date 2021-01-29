@@ -1,40 +1,35 @@
-import numpy as np
-
 import argparse
+import numpy as np 
+
+
+def gen_array(n):
+	a = np.eye(n)
+	odd = a[0::2, :]
+	even = a[1::2, :]
+	return np.concatenate((odd, even), axis = 0)
+
 def crop_array(arr_2d:np.array, offset_height:int, offset_width:int, target_height:int, target_width:int):
-    return arr_2d[offset_height:offset_height + target_height + 1, offset_width:offset_width + target_width + 1]
+	n = arr_2d[offset_height:offset_height + target_height, offset_width:offset_width + target_width]
+	return n
 
 
+if __name__ == '__main__':
+	parser = argparse.ArgumentParser(description = 'Matrix Row Manipulation')
+	parser.add_argument('--N', type = int, default = 2, help = 'Matrix size')
+	args = parser.parse_args()
 
-parser = argparse.ArgumentParser(description='Matrix Row Manipulation')
+	n = args.N
 
-parser.add_argument('--N', type = int, help = 'Size of matrix')
+	orig_arr = gen_array(n)
+	print("Original array:\n{}\n".format(orig_arr))
 
-args = parser.parse_args()
+	i, r = n//2, n%2
+	crop_arr = crop_array(orig_arr, i - 1, i - 1, i + r, i + r)
+	print("Cropped array:\n{}\n".format(crop_arr))
 
-n = args.N
+	pad_arr = np.pad(crop_arr, (2, 2), mode = 'constant', constant_values = (0.5, 0.5))
+	print("Padded array:\n{}\n".format(pad_arr))
 
-orig_mat = np.zeros((n,n))
-ind_1 = n//2
-if n %2 == 1:
-    ind_1 +=1 
-orig_mat[np.arange(0,ind_1), np.arange(0,n,2)] = 1
-orig_mat[np.arange(ind_1, n), np.arange(1,n,2)] = 1
-print("Original array:")
+	concat_arr = np.concatenate((pad_arr, pad_arr), axis = 1)
+	print("Concatenated array: shape={a}\n{b}".format(a = concat_arr.shape, b = concat_arr))
 
-print(orig_mat)
-
-print("\nCropped array:")
-if n%2 == 0:
-    cropped_array = crop_array(orig_mat, ind_1-1, ind_1-1, ind_1-1, ind_1-1)
-else:
-    cropped_array = crop_array(orig_mat, ind_1-2, ind_1-2, ind_1-1, ind_1-1)
-    
-print(cropped_array)
-
-pad_array = np.pad(cropped_array, (2,2), 'constant', constant_values = (0.5,0.5))
-print("\nPadded array:")
-print(pad_array)
-concat_arr = np.concatenate((pad_array, pad_array), axis = 1)
-print(f"\nConcatenated array: shape={concat_arr.shape}")
-print(concat_arr)
