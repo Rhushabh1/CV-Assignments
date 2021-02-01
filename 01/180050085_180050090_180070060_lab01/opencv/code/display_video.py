@@ -1,4 +1,4 @@
-'''streaming webcam vid'''
+'''displaying recorded video'''
 import numpy as np
 import cv2 as cv
 import argparse
@@ -18,8 +18,10 @@ if __name__ == '__main__':
         # Display the resulting frame
         cv.namedWindow('original')
         cv.moveWindow('original',100,100)
-        cv.imshow('original',frame)
-        
+        try:
+            cv.imshow('original',frame)
+        except:
+            break
         # grayscale version of frame
         gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY) 
         cv.rectangle(gray,(490,30),(600,5),(255,255,255),-1)
@@ -28,7 +30,7 @@ if __name__ == '__main__':
         cv.moveWindow('grayscale version',1000,100)
         cv.imshow('grayscale version',gray)
 
-        if cv.waitKey(1) & 0xFF == ord('q'):
+        if cv.waitKey(25) & 0xFF == ord('q'):
             break
 
     cap.release()
