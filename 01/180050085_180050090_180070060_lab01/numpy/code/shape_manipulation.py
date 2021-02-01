@@ -8,7 +8,7 @@ if __name__ == '__main__':
 	args = parser.parse_args()
 
 	path = args.path
-	mat = np.loadtxt(path, dtype = 'i', delimiter = ',')
+	mat = np.loadtxt(path, dtype = 'int', delimiter = ',')
 
 	m = int(input("M = "))
 	n = int(input("N = "))

@@ -3,3 +3,11 @@ This file contains justifications and assumptions for some of the questions
 1) Row Manipulation:
 
 We have created all the specified functions which returns results properly, but we have matched the console output for N = 4 since more examples were not provided to concretely formulate the 2D slice that we are asked to crop out of the original array.
+
+2) Shape Manipulation:
+
+We are assuming that the elements in the .txt file that is to be read, will be of int type. This makes sense because in the example given in the problem statement, only integers are being printed and not floats.
+
+3) PCA:
+
+Here also, we have read the contents of the .txt file as floats.
