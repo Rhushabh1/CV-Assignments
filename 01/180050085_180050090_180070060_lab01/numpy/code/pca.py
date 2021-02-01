@@ -9,7 +9,7 @@ if __name__ == '__main__':
 	args = parser.parse_args()
 
 	path = args.path
-	X = np.loadtxt(path, dtype = 'i', delimiter = ',')
+	X = np.loadtxt(path, dtype = np.float64, delimiter = ',')
 
 	n, d = X.shape
 	X_new = (X - np.mean(X, axis = 0))/np.std(X, axis = 0, ddof = 1)
