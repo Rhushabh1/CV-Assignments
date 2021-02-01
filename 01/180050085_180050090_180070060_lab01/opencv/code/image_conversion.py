@@ -12,20 +12,24 @@ if __name__ == '__main__':
 	path = args.path
 
 	orig_img = cv.imread(path, 1)
-	norm_img = orig_img
+	norm_img = orig_img / 255
+	inv_img = cv.cvtColor(orig_img, cv.COLOR_RGB2BGR)
 
 	# matplotlib
 	fig, (ax1, ax2) = plt.subplots(1, 2)
 	fig.suptitle("Plotting images using matplotlib")
-	ax1.imshow(orig_img)
+	ax1.imshow(inv_img)
 	ax1.title.set_text("Original Image")
-	ax2.imshow(norm_img)
+	ax2.imshow(inv_img / 255)
 	ax2.title.set_text("Normalized Image")
+	plt.savefig("../results/image_conversion_matplotlib.png")
 	plt.show()
 
 	# opencv
 	norm_img = norm_img.astype(np.uint8)
 	cv.imshow("Original Image", orig_img)
-	cv.imshow("Normalized Image", cv.cvtColor(norm_img, cv.COLOR_RGB2BGR))
+	cv.imshow("Normalized Image", inv_img)
+	cv.imwrite("../results/image_conversion_opencv_orig.png", orig_img)
+	cv.imwrite("../results/image_conversion_opencv_norm.png", inv_img)
 	cv.waitKey(0)
 	cv.destroyAllWindows()

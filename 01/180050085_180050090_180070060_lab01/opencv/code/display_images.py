@@ -16,7 +16,7 @@ if __name__ == '__main__':
 	idx = 0
 	cv.imshow("Display Images", imgs[idx])
 
-	key = cv.waitKey(0)
+	key = cv.waitKey(-1)
 	while key in [ord('n'), ord('p')]:
 		if key == ord('n'):
 			idx = (idx + 1)%num_imgs
@@ -24,6 +24,6 @@ if __name__ == '__main__':
 			idx = (idx - 1)%num_imgs
 
 		cv.imshow("Display Images", imgs[idx])
-		key = cv.waitKey(0)
+		key = cv.waitKey(-1)
 
 	cv.destroyAllWindows()
