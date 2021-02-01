@@ -6,7 +6,7 @@ We have created all the specified functions which returns results properly, but 
 
 2) Shape Manipulation:
 
-We are assuming that the elements in the .txt file that is to be read, will be of int type. This makes sense because in the example given in the problem statement, only integers are being printed and not floats.
+We have assumed the arrays to be integer arrays since if we keep it as float it won't match the sample output.
 
 3) PCA:
 
