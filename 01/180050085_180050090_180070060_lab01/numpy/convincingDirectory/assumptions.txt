@@ -1,0 +1,5 @@
+This file contains justifications and assumptions for some of the questions
+
+1) Row Manipulation:
+
+We have created all the specified functions which returns results properly, but we have matched the console output for N = 4 since more examples were not provided to concretely formulate the 2D slice that we are asked to crop out of the original array.

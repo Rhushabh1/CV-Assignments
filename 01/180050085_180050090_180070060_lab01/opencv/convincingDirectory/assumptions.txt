@@ -1,0 +1,5 @@
+This file contains justifications and assumptions for some of the questions
+
+1) Image Conversion:
+
+We have converted the scheme of the image from RGB to BGR to plot it appropriately in matplotlib. For OpenCV, we have used the inverted scheme image for Normalized display.
