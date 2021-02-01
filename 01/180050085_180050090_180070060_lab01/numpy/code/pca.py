@@ -29,4 +29,4 @@ if __name__ == '__main__':
 	plt.ylim([-15, 15])
 	plt.gca().set_aspect(1)
 	# plt.show()
-	plt.savefig("../data/out.png")
+	plt.savefig("../results/out.png")

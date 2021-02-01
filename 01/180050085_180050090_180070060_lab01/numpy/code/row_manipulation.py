@@ -9,7 +9,8 @@ def gen_array(n):
 	return np.concatenate((odd, even), axis = 0)
 
 def crop_array(arr_2d:np.array, offset_height:int, offset_width:int, target_height:int, target_width:int):
-	n = arr_2d[offset_height:offset_height + target_height, offset_width:offset_width + target_width]
+	# Since the bottom right corner is offset_height + target height, we need to keep the rhs as offset_height + target_height + 1 
+	n = arr_2d[offset_height:offset_height + target_height +1, offset_width:offset_width + target_width+1]
 	return n
 
 
@@ -23,8 +24,7 @@ if __name__ == '__main__':
 	orig_arr = gen_array(n)
 	print("Original array:\n{}\n".format(orig_arr))
 
-	i, r = n//2, n%2
-	crop_arr = crop_array(orig_arr, i - 1, i - 1, i + r, i + r)
+	crop_arr = crop_array(orig_arr, 1, 1, 1, 1)
 	print("Cropped array:\n{}\n".format(crop_arr))
 
 	pad_arr = np.pad(crop_arr, (2, 2), mode = 'constant', constant_values = (0.5, 0.5))
