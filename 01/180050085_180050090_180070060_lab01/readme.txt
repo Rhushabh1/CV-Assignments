@@ -12,3 +12,9 @@ https://numpy.org/doc/stable/reference/generated/numpy.loadtxt.html
 
 2) To find Eigenvalues and Eigenvectors of a matrix
 https://numpy.org/doc/stable/reference/generated/numpy.linalg.eig.html
+
+3) Documentation for argparse
+https://docs.python.org/3/library/argparse.html
+
+4) Video display using OpenCV
+https://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_gui/py_video_display/py_video_display.html
