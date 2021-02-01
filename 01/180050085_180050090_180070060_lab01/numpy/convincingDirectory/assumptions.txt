@@ -3,3 +3,7 @@ This file contains justifications and assumptions for some of the questions
 1) Row Manipulation:
 
 We have created all the specified functions which returns results properly, but we have matched the console output for N = 4 since more examples were not provided to concretely formulate the 2D slice that we are asked to crop out of the original array.
+
+1) Shape Manipulation:
+
+We have assumed the arrays to be integer arrays since if we keep it as float it won't match the sample output.
