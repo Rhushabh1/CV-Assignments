@@ -15,7 +15,6 @@ if __name__ == '__main__':
     parser = argparse
 
     dist_image = cv2.imread("../data/distorted.jpg")
-    curr_image = cv2.imread("../data/distorted.jpg", cv2.IMREAD_GRAYSCALE)
     size_X, size_Y = dist_image.shape[0:2]
     size_X -= 1
     size_Y -= 1
