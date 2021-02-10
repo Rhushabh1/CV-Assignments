@@ -19,14 +19,14 @@ if __name__ == '__main__':
     size_X -= 1
     size_Y -= 1
     done = False
-    print(dist_image[599,599])
-    print(size_X, size_Y)
+    # print(dist_image[599,599])
+    # print(size_X, size_Y)
     x,y = -1, -1
     min_score = 300
     for i in range(size_X,-1,-1):
         for j in range(size_Y,-1,-1):
             if np.sum(dist_image[i,j]) > 300:
-                print(np.sum(dist_image[i,j]))
+                # print(np.sum(dist_image[i,j]))
                 x,y = i,j
                 done = True
                 break
@@ -50,12 +50,12 @@ if __name__ == '__main__':
         p = ((x - 599)/599 + x_2/599)/2
         q = ((y - 599)/599 + y_2/599)/2
 
-        print(x - 599,x_2)
-        print(y - 599, y_2)
+        # print(x - 599,x_2)
+        # print(y - 599, y_2)
 
         p = round(p,3)
         q = round(q,3)
-        print(p,q)
+        # print(p,q)
         
         orig_transform = np.asarray([[1,p,0],[q,1,0]])
         # warp_mat = cv2.warpAffine(dist_image, orig_transform, (600,600))
@@ -65,7 +65,7 @@ if __name__ == '__main__':
         
         source_points = np.array([[x,y],[x_2,599],[599,y_2]]).astype(np.float32)
         destination_points = np.array([[599,599], [0,599], [599,0]]).astype(np.float32)
-        print(source_points.shape, destination_points.shape)
+        # print(source_points.shape, destination_points.shape)
         M = cv2.getAffineTransform(source_points,destination_points)
         warp_mat = cv2.warpAffine(dist_image, M, (600,600))
 

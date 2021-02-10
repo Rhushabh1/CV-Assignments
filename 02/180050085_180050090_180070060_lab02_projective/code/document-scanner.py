@@ -49,7 +49,7 @@ if __name__ == '__main__':
     warp_doc = cv.warpPerspective(imgray, M, (w, h))
     final_doc = cv.adaptiveThreshold(warp_doc, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 115, 8)
 
-    cv.imshow("Warped Document", final_doc)
+    # cv.imshow("Warped Document", final_doc)
     filename = os.path.basename(args.i).split('.')[0]
     cv.imwrite("../results/"+filename+"-output.jpg", final_doc)
 
