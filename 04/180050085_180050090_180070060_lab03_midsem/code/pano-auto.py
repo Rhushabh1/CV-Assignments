@@ -33,14 +33,6 @@ if __name__ == "__main__":
 	kpt, ftt = descriptor.detectAndCompute(train_img_bw,None)
 
 
-	fig, (ax1,ax2) = plt.subplots(nrows=1, ncols=2, figsize=(20,8), constrained_layout=False)
-	ax1.imshow(cv.drawKeypoints(train_img,kpq,None,color=(0,255,0)))
-	ax1.set_xlabel("(a)", fontsize=14)
-	ax2.imshow(cv.drawKeypoints(query_img,kpt,None,color=(0,255,0)))
-	ax2.set_xlabel("(b)", fontsize=14)
-	plt.show()
-
-
 	# create BFMatcher object
 	# bf = cv.BFMatcher(cv.NORM_HAMMING, crossCheck=False)
 	# matches = bf.knnMatch(ftq, ftt, k = 2)
