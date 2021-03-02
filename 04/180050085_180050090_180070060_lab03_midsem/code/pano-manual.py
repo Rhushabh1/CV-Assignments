@@ -21,7 +21,7 @@ if __name__ == "__main__":
 	files = os.listdir(path)
 
 	# train img is the one to be transformed
-	train_img, query_img = [cv.imread(os.path.join(path, f), 1) for f in sorted(files)]
+	train_img, query_img = [cv.imread(os.path.join(path, f), 1) for f in sorted(files, reverse = False)]
 	# query_img, train_img = [cv.imread(os.path.join(path, f), 1) for f in sorted(files)]
 
 	# input point correspondences
@@ -93,10 +93,10 @@ if __name__ == "__main__":
 	y_min = int(H_prime[1,2])
 	pano = cv.warpPerspective(train_img, H_prime @ H, (train_img.shape[1] + query_img.shape[1], train_img.shape[0] + query_img.shape[0]))
 	pano[y_min:y_min + query_img.shape[0], x_min:x_min + query_img.shape[1]] = query_img
-
+	
 	# save final pano first
 	dest_dir = os.path.normpath(path).split(os.sep)[-1]
-	cv.imwrite("../results/pano-manual-results/{}.png".format(dest_dir), pano)
+	cv.imwrite("../results/pano-auto-results/{}.png".format(dest_dir), pano)
 	cv.imshow("result", pano)
-	cv.waitKey(-1)
+	cv.waitKey(0)
 	cv.destroyAllWindows()

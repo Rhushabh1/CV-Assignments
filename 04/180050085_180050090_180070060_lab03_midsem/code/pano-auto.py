@@ -1,20 +1,7 @@
 import os, sys
 import numpy as np 
 import cv2 as cv
-import matplotlib.pyplot as plt
 import math
-kpT = []
-kpQ = []
-
-# callback functions
-def add_train_kps(event, x, y, flags, param):
-	if event == cv.EVENT_LBUTTONDOWN:
-		kpT.append(cv.KeyPoint(x, y, 5))
-
-def add_query_kps(event, x, y, flags, param):
-	if event == cv.EVENT_LBUTTONDOWN:
-		kpQ.append(cv.KeyPoint(x, y, 5))
-
 if __name__ == "__main__":
 	path = sys.argv[1]
 	files = os.listdir(path)
@@ -22,7 +9,8 @@ if __name__ == "__main__":
 	
 
 	# train img is the one to be transformed
-	query_img, train_img = [cv.imread(os.path.join(path, f), 1) for f in files]
+	print
+	query_img, train_img = [cv.imread(os.path.join(path, f), 1) for f in sorted(files, reverse = True)]
 
 	# # input point correspondences
 	query_img_bw = cv.cvtColor(query_img, cv.COLOR_BGR2GRAY)
