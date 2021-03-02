@@ -22,7 +22,7 @@ if __name__ == "__main__":
 	
 
 	# train img is the one to be transformed
-	train_img, query_img = [cv.imread(os.path.join(path, f), 1) for f in files]
+	query_img, train_img = [cv.imread(os.path.join(path, f), 1) for f in files]
 
 	# # input point correspondences
 	query_img_bw = cv.cvtColor(query_img, cv.COLOR_BGR2GRAY)
