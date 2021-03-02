@@ -22,7 +22,7 @@ if __name__ == "__main__":
 	
 
 	# train img is the one to be transformed
-	query_img, train_img = [cv.imread(os.path.join(path, f), 1) for f in files]
+	train_img, query_img = [cv.imread(os.path.join(path, f), 1) for f in files]
 
 	# # input point correspondences
 	query_img_bw = cv.cvtColor(query_img, cv.COLOR_BGR2GRAY)
@@ -57,6 +57,13 @@ if __name__ == "__main__":
 	bf = cv.BFMatcher(cv.NORM_HAMMING, crossCheck=True)
 	matches = bf.match(ftq, ftt)
 
+	img3 = cv.drawMatches(query_img,kpq,train_img,kpt,np.random.choice(matches, 35),None, flags=2)
+
+	# matches = (sorted(matches, key = lambda d :d.distance,reverse = True))[:10]
+	# im_matches = cv.drawMatches(train_img,kpt,query_img,kpq,matches, None,flags=cv.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
+	cv.imshow("matches", img3)
+	cv.waitKey(0)
+	cv.destroyAllWindows()
 
 
 	kpT = np.float32([kp.pt for kp in kpt])
@@ -71,7 +78,7 @@ if __name__ == "__main__":
 	else:
 		raise AssertionError("Insufficient Keypoints (<4)")
 
-	print(H)
+	# print(H)
 
 	image_corners = np.float32(
 		[[[0,0]],[[train_img.shape[1]-1,0]], [[0,train_img.shape[0]-1]],[[train_img.shape[1]-1,train_img.shape[0]-1]]]
@@ -109,6 +116,10 @@ if __name__ == "__main__":
 	y_min = int(H_prime[1,2])
 	pano = cv.warpPerspective(train_img, H_prime @ H, (train_img.shape[1] + query_img.shape[1], train_img.shape[0] + query_img.shape[0]))
 	pano[y_min:y_min + query_img.shape[0], x_min:x_min + query_img.shape[1]] = query_img
+	
+	# save final pano first
+	dest_dir = os.path.normpath(path).split(os.sep)[-1]
+	cv.imwrite("../results/pano-auto-results/{}.png".format(dest_dir), pano)
 	cv.imshow("result", pano)
 	cv.waitKey(0)
 	cv.destroyAllWindows()
