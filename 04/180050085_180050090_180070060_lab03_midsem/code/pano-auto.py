@@ -2,6 +2,7 @@ import os, sys
 import numpy as np 
 import cv2 as cv
 import matplotlib.pyplot as plt
+import math
 kpT = []
 kpQ = []
 
@@ -41,20 +42,21 @@ if __name__ == "__main__":
 
 
 	# create BFMatcher object
-	bf = cv.BFMatcher(cv.NORM_HAMMING, crossCheck=True)
+	# bf = cv.BFMatcher(cv.NORM_HAMMING, crossCheck=False)
+	# matches = bf.knnMatch(ftq, ftt, k = 2)
+	# # ratio test
+	# good = []
+	# for m, n in matches:
+	# 	if m.distance < 0.75 * n.distance:
+	# 		good.append(m)
+	# matches = good
+	# # Draw first 10 matches.
+	# img3 = cv.drawMatches(query_img,kpq,train_img,kpt,matches[:35],None, flags=2)
 
-	# Match descriptors.
+
+	bf = cv.BFMatcher(cv.NORM_HAMMING, crossCheck=True)
 	matches = bf.match(ftq, ftt)
 
-	# Sort them in the order of their distance.
-	matches = sorted(matches, key = lambda x:x.distance)
-
-	# Draw first 10 matches.
-	img3 = cv.drawMatches(query_img,kpq,train_img,kpt,matches[:35],None, flags=2)
-
-	# matches = (sorted(matches, key = lambda d :d.distance,reverse = True))[:10]
-	# im_matches = cv.drawMatches(train_img,kpt,query_img,kpq,matches, None,flags=cv.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
-	cv.imshow("matches", img3)
 
 
 	kpT = np.float32([kp.pt for kp in kpt])
@@ -71,8 +73,42 @@ if __name__ == "__main__":
 
 	print(H)
 
-	pano = cv.warpPerspective(train_img, H, (train_img.shape[1] + query_img.shape[1], train_img.shape[0] + query_img.shape[0]))
-	pano[0:query_img.shape[0], 0:query_img.shape[1]] = query_img
+	image_corners = np.float32(
+		[[[0,0]],[[train_img.shape[1]-1,0]], [[0,train_img.shape[0]-1]],[[train_img.shape[1]-1,train_img.shape[0]-1]]]
+	)
+
+	modified_image_corners = cv.perspectiveTransform(image_corners, H)
+	modified_image_corners_X = modified_image_corners[:,:,0]
+	modified_image_corners_Y = modified_image_corners[:,:,1]
+	print(modified_image_corners)
+	print(modified_image_corners_X, modified_image_corners_Y)
+
+	x_min = np.min(modified_image_corners_X)
+	y_min = np.min(modified_image_corners_Y)
+	H_prime = np.eye(3)
+
+	x_min = math.floor(x_min)
+	y_min = math.floor(y_min)
+	if(x_min <0):
+		H_prime[0,2] = -x_min
+	else:
+		x_min = 0
+	if (y_min < 0):
+		H_prime[1,2] = -y_min
+	else:
+		y_min = 0
+	
+	print(H_prime)
+
+
+	print(H)
+
+
+
+	x_min = int(H_prime[0,2])
+	y_min = int(H_prime[1,2])
+	pano = cv.warpPerspective(train_img, H_prime @ H, (train_img.shape[1] + query_img.shape[1], train_img.shape[0] + query_img.shape[0]))
+	pano[y_min:y_min + query_img.shape[0], x_min:x_min + query_img.shape[1]] = query_img
 	cv.imshow("result", pano)
 	cv.waitKey(0)
 	cv.destroyAllWindows()

@@ -1,7 +1,7 @@
 import os, sys
 import numpy as np 
 import cv2 as cv
-
+import math
 # keypoints
 kpT = []
 kpQ = []
@@ -57,15 +57,42 @@ if __name__ == "__main__":
 		raise AssertionError("Insufficient Keypoints (<4)")
 	# print(H)
 
-	h1, w1 = query_img.shape[:2]
+	image_corners = np.float32(
+		[[[0,0]],[[train_img.shape[1]-1,0]], [[0,train_img.shape[0]-1]],[[train_img.shape[1]-1,train_img.shape[0]-1]]]
+	)
+
+	modified_image_corners = cv.perspectiveTransform(image_corners, H)
+	modified_image_corners_X = modified_image_corners[:,:,0]
+	modified_image_corners_Y = modified_image_corners[:,:,1]
+	print(modified_image_corners)
+	print(modified_image_corners_X, modified_image_corners_Y)
+
+	x_min = np.min(modified_image_corners_X)
+	y_min = np.min(modified_image_corners_Y)
+	H_prime = np.eye(3)
+
+	x_min = math.floor(x_min)
+	y_min = math.floor(y_min)
+	if(x_min <0):
+		H_prime[0,2] = -x_min
+	else:
+		x_min = 0
+	if (y_min < 0):
+		H_prime[1,2] = -y_min
+	else:
+		y_min = 0
+	
+	print(H_prime)
+
+
+	print(H)
 
 
 
-	print(H.shape)
-
-	# draw warped image
-	pano = cv.warpPerspective(train_img, H, (train_img.shape[1] + query_img.shape[1], train_img.shape[0] + query_img.shape[0]))
-	pano[0:query_img.shape[0], 0:query_img.shape[1]] = query_img
+	x_min = int(H_prime[0,2])
+	y_min = int(H_prime[1,2])
+	pano = cv.warpPerspective(train_img, H_prime @ H, (train_img.shape[1] + query_img.shape[1], train_img.shape[0] + query_img.shape[0]))
+	pano[y_min:y_min + query_img.shape[0], x_min:x_min + query_img.shape[1]] = query_img
 	cv.imshow("result", pano)
 	cv.waitKey(-1)
 	cv.destroyAllWindows()
