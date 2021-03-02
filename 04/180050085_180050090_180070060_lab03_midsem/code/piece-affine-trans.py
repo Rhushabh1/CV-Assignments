@@ -56,4 +56,5 @@ for i in range(rows-1,-1,-1):
 
 fig, ax = plt.subplots()
 ax.imshow(out[start+3:end+1,:,:])
+plt.savefig("../results/piece-affine-results/brick.png")
 plt.show()
