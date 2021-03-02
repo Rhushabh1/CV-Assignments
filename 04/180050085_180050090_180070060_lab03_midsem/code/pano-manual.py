@@ -21,7 +21,8 @@ if __name__ == "__main__":
 	files = os.listdir(path)
 
 	# train img is the one to be transformed
-	train_img, query_img = [cv.imread(os.path.join(path, f), 1) for f in sorted(files)]
+	# train_img, query_img = [cv.imread(os.path.join(path, f), 1) for f in sorted(files)]
+	query_img, train_img = [cv.imread(os.path.join(path, f), 1) for f in files]
 
 	# input point correspondences
 	cv.namedWindow("train", cv.WINDOW_NORMAL)
@@ -49,8 +50,8 @@ if __name__ == "__main__":
 
 	# find homography
 	if len(matches) >= 4:
-		src = np.float32([kpT[m.queryIdx].pt for m in matches])
-		dst = np.float32([kpQ[m.trainIdx].pt for m in matches])
+		src = np.float32([kpT[m.queryIdx].pt for m in matches]).reshape(-1,1,2)
+		dst = np.float32([kpQ[m.trainIdx].pt for m in matches]).reshape(-1,1,2)
 		H, masked = cv.findHomography(src, dst, cv.RANSAC, 5.0)
 	else:
 		raise AssertionError("Insufficient Keypoints (<4)")
