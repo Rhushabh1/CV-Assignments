@@ -88,6 +88,9 @@ if __name__ == "__main__":
 	# change function defn
 	pano = multi_mosaic(imgs, ref_idx)
 
+	# save final pano first
+	dest_dir = os.path.normpath(path).split(os.sep)[-1]
+	cv.imwrite("../results/pano-general-results/{}.png".format(dest_dir), pano)
 	cv.imshow("result", pano)
 	cv.waitKey(-1)
 	cv.destroyAllWindows()
