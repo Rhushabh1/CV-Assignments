@@ -2,6 +2,7 @@ import os, sys
 import numpy as np 
 import cv2 as cv
 
+# keypoints
 kpT = []
 kpQ = []
 
@@ -14,17 +15,20 @@ def add_query_kps(event, x, y, flags, param):
 	if event == cv.EVENT_LBUTTONDOWN:
 		kpQ.append(cv.KeyPoint(x, y, 5))
 
+
 if __name__ == "__main__":
 	path = sys.argv[1]
 	files = os.listdir(path)
 
 	# train img is the one to be transformed
+	# train_img, query_img = [cv.imread(os.path.join(path, f), 1) for f in sorted(files)]
 	query_img, train_img = [cv.imread(os.path.join(path, f), 1) for f in files]
 
 	# input point correspondences
 	cv.namedWindow("train", cv.WINDOW_NORMAL)
-	cv.setMouseCallback("train", add_train_kps)
 	cv.namedWindow("query", cv.WINDOW_NORMAL)
+
+	cv.setMouseCallback("train", add_train_kps)
 	cv.setMouseCallback("query", add_query_kps)
 
 	# cv.resizeWindow("train", 500, 500)
@@ -45,19 +49,13 @@ if __name__ == "__main__":
 	cv.destroyAllWindows()
 
 	# find homography
-	# kps to numpy arrays
-	# kpT = np.float32([kp.pt for kp in kpT])
-	# kpQ = np.float32([kp.pt for kp in kpQ])
-
-	# get correspondences
-
 	if len(matches) >= 4:
 		src = np.float32([kpT[m.trainIdx].pt for m in matches]).reshape(-1,1,2)
 		dst = np.float32([kpQ[m.queryIdx].pt for m in matches]).reshape(-1,1,2)
 		H, masked = cv.findHomography(src, dst, cv.RANSAC, 5.0)
-
 	else:
 		raise AssertionError("Insufficient Keypoints (<4)")
+	# print(H)
 
 	h1, w1 = query_img.shape[:2]
 
@@ -65,8 +63,9 @@ if __name__ == "__main__":
 
 	print(H.shape)
 
+	# draw warped image
 	pano = cv.warpPerspective(train_img, H, (train_img.shape[1] + query_img.shape[1], train_img.shape[0] + query_img.shape[0]))
 	pano[0:query_img.shape[0], 0:query_img.shape[1]] = query_img
 	cv.imshow("result", pano)
-	cv.waitKey(0)
+	cv.waitKey(-1)
 	cv.destroyAllWindows()
