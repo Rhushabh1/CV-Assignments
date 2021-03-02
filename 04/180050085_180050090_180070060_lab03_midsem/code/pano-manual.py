@@ -50,12 +50,18 @@ if __name__ == "__main__":
 
 	# find homography
 	if len(matches) >= 4:
-		src = np.float32([kpT[m.queryIdx].pt for m in matches]).reshape(-1,1,2)
-		dst = np.float32([kpQ[m.trainIdx].pt for m in matches]).reshape(-1,1,2)
+		src = np.float32([kpT[m.trainIdx].pt for m in matches]).reshape(-1,1,2)
+		dst = np.float32([kpQ[m.queryIdx].pt for m in matches]).reshape(-1,1,2)
 		H, masked = cv.findHomography(src, dst, cv.RANSAC, 5.0)
 	else:
 		raise AssertionError("Insufficient Keypoints (<4)")
 	# print(H)
+
+	h1, w1 = query_img.shape[:2]
+
+
+
+	print(H.shape)
 
 	# draw warped image
 	pano = cv.warpPerspective(train_img, H, (train_img.shape[1] + query_img.shape[1], train_img.shape[0] + query_img.shape[0]))
