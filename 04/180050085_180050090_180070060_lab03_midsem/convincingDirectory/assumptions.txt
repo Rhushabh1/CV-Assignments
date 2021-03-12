@@ -1,0 +1,6 @@
+2) Panoramic Image Mosaicing (Manual & Auto):
+
+In this task, we have taken the 2​nd​ image as the Reference image (or Query image - Q) and the 1st​ image as the one to be transformed (or Train image - T).
+
+Reason: 
+I1 corresponds to the right part of the panorama and I2 to the left part of the same. This results in I2 getting pushed out of the image frame when transformed to I1.

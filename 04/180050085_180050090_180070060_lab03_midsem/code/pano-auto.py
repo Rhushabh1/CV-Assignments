@@ -9,7 +9,7 @@ if __name__ == "__main__":
 	
 
 	# train img is the one to be transformed
-	print
+	# print
 	query_img, train_img = [cv.imread(os.path.join(path, f), 1) for f in sorted(files, reverse = True)]
 
 	# # input point correspondences
@@ -67,8 +67,8 @@ if __name__ == "__main__":
 	modified_image_corners = cv.perspectiveTransform(image_corners, H)
 	modified_image_corners_X = modified_image_corners[:,:,0]
 	modified_image_corners_Y = modified_image_corners[:,:,1]
-	print(modified_image_corners)
-	print(modified_image_corners_X, modified_image_corners_Y)
+	# print(modified_image_corners)
+	# print(modified_image_corners_X, modified_image_corners_Y)
 
 	x_min = np.min(modified_image_corners_X)
 	y_min = np.min(modified_image_corners_Y)
@@ -85,10 +85,10 @@ if __name__ == "__main__":
 	else:
 		y_min = 0
 	
-	print(H_prime)
+	# print(H_prime)
 
 
-	print(H)
+	# print(H)
 
 
 
