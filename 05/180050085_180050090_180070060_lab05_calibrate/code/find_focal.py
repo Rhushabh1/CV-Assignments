@@ -12,17 +12,29 @@ def add_kps(event, x, y, flags, param):
 
 
 if __name__ == "__main__":
-	try:
-		path = "../data/calib_images/{}.jpg".format(sys.argv[1])
-	except:
-		path = "../data/calib_images/cube1.jpg"
-	img = cv.imread(path, 1)
+	# try:
+	# 	path = "../data/calib_images/{}.jpg".format(sys.argv[1])
+	# except:
+	# 	path = "../data/calib_images/cube1.jpg"
+
+	#images for calibration
+	img1 = cv.imread("../data/calib_images/cube1.jpg", 1)
+	img2 = cv.imread("../data/calib_images/cube2.jpg",1)
 
 	# take imgpoints manually
-	cv.namedWindow("Calibrate", cv.WINDOW_NORMAL | cv.WINDOW_KEEPRATIO)
-	cv.resizeWindow("Calibrate", 1000, 750)
-	cv.setMouseCallback("Calibrate", add_kps)
-	cv.imshow("Calibrate", img)
+	cv.namedWindow("calibrate_img1", cv.WINDOW_NORMAL | cv.WINDOW_KEEPRATIO)
+	cv.resizeWindow("calibrate_img1", 1000, 750)
+	cv.setMouseCallback("calibrate_img1", add_kps)
+	cv.imshow("calibrate_img1", img1)
+
+	cv.waitKey(-1)
+	cv.destroyAllWindows()
+
+	cv.namedWindow("calibrate_img2", cv.WINDOW_NORMAL | cv.WINDOW_KEEPRATIO)
+	cv.resizeWindow("calibrate_img2", 1000, 750)
+	cv.setMouseCallback("calibrate_img2", add_kps)
+	cv.imshow("calibrate_img2", img2)
+
 	cv.waitKey(-1)
 	cv.destroyAllWindows()
 
@@ -31,11 +43,11 @@ if __name__ == "__main__":
 	# 15mm for chess board
 	objp = np.zeros((6, 3), np.float32)
 	objp[:,:2] = np.mgrid[0:3,0:2].T.reshape(-1,2)
-	objpoints = [objp * 23]
+	objpoints = [np.tile(objp * 23,(2,1))]
 	imgpoints = np.array([imgpoints]).astype(np.float32)
 
 	# image and camera sensor specs
-	gray_img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+	gray_img = cv.cvtColor(img1, cv.COLOR_BGR2GRAY)
 	imageSize = gray_img.shape[::-1]
 	apertureWidth, apertureHeight = 4.74/1.79, 4.74/1.79
 
