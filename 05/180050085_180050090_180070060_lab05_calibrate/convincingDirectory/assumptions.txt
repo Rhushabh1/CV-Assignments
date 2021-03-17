@@ -1,0 +1,6 @@
+1.1
+
+1.2
+
+1.3
+In this assignment,we have assumed that the rotation is minimal and the grid is 3 X 2 as per the samples shown.
