@@ -84,11 +84,10 @@ if __name__ == "__main__":
 
     # compute camera matrix and focal length
     retval, cameraMatrix, distCoeffs, rvecs, tvecs = cv.calibrateCamera(objpoints, imgpoints, imageSize, None, None)
-
     objp = np.zeros((6, 3), np.float32)
     objp[:,:2] = np.mgrid[0:3,0:2].T.reshape(-1,2)
     test_objpoints = objp * 23
-    rep_imgpoints, jacob = cv.projectPoints(test_objpoints, rvecs[ind], tvecs[ind], cameraMatrix, distCoeffs[ind])
+    rep_imgpoints, jacob = cv.projectPoints(test_objpoints, rvecs[ind], tvecs[ind], cameraMatrix, distCoeffs)
 
     rep_imgpoints = rep_imgpoints.reshape((6,2)).astype(int)
     test_imgpoints = np.array(test_imgpoints)
