@@ -48,7 +48,10 @@ if __name__ == "__main__":
 
 	# compute camera matrix and focal length
 	retval, cameraMatrix, distCoeffs, rvecs, tvecs = cv.calibrateCamera(objpoints, imgpoints, imageSize, None, None)
-	# fovx, fovy, focalLength, principalPoint, aspectRatio = cv.calibrationMatrixValues(cameraMatrix, imageSize, apertureWidth, apertureHeight)
-	print(cameraMatrix)
+	pixelSize = 0.0016
+	fx = cameraMatrix[0, 0] * pixelSize
+	fy = cameraMatrix[1, 1] * pixelSize
+	focalLength = (fx + fy)/2
 
+	print("Fx: {}mm\tFy: {}mm".format(round(fx, 5), round(fy, 5)))
 	print("Focal Length: {0:.5f}mm".format(focalLength))

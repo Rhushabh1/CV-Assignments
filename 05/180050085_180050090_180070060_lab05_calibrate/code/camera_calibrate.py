@@ -94,7 +94,6 @@ if __name__ == "__main__":
     rep_err = 0
     for i in range(6):
         rep_err += np.sqrt(np.sum(np.square(rep_imgpoints[i, :] - test_imgpoints[i, :])))
-        print(rep_imgpoints[i, :] - test_imgpoints[i, :], np.sqrt(np.sum(np.square(rep_imgpoints[i, :] - test_imgpoints[i, :]))))
     rep_err /= 6
 
     print("Reprojection Error: {}".format(rep_err))
