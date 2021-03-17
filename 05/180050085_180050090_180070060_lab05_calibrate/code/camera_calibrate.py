@@ -19,11 +19,13 @@ def add_kps(event, x, y, flags, param):
 		imgpoints.append([x, y])
 
 if __name__ == "__main__":
+    ind = 0
     try:
-        path = "../data/calib_images/{}.jpg".format(sys.argv[1])
+        path = "../data/calib_images/cube{}.jpg".format(sys.argv[1])
+        ind = int(sys.argv[1])-1
     except:
         path = "../data/calib_images/cube1.jpg"
-
+    
     #test image
     img = cv.imread(path)
     cv.namedWindow("mark_test_img", cv.WINDOW_NORMAL | cv.WINDOW_KEEPRATIO)
@@ -68,26 +70,24 @@ if __name__ == "__main__":
 
     # object points in 3D real world coordinate 
     # 23mm for 3x3 rubix cube
-    # 15mm for chess board
-    intake = 4
+    intake = 6
     objp = np.zeros((intake, 3), np.float32)
     objp[:,:2] = np.mgrid[0:intake/2,0:2].T.reshape(-1,2)
     objpoints = np.tile(objp * 23, (3, 1, 1))
     imgpoints = np.array(imgpoints).astype(np.float32).reshape(3, intake, 2)
+    # print(objpoints.shape)
+    # print(imgpoints.shape)
 
     # image and camera sensor specs
     gray_img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
     imageSize = gray_img.shape[::-1]
-    apertureWidth, apertureHeight = 4.7/1.8, 4.7/1.8
 
     # compute camera matrix and focal length
     retval, cameraMatrix, distCoeffs, rvecs, tvecs = cv.calibrateCamera(objpoints, imgpoints, imageSize, None, None)
-    fovx, fovy, focalLength, principalPoint, aspectRatio = cv.calibrationMatrixValues(cameraMatrix, imageSize, apertureWidth, apertureHeight)
-
     objp = np.zeros((6, 3), np.float32)
     objp[:,:2] = np.mgrid[0:3,0:2].T.reshape(-1,2)
     test_objpoints = objp * 23
-    rep_imgpoints, jacob = cv.projectPoints(test_objpoints, rvecs[0], tvecs[0], cameraMatrix, None)
+    rep_imgpoints, jacob = cv.projectPoints(test_objpoints, rvecs[ind], tvecs[ind], cameraMatrix, distCoeffs)
 
     rep_imgpoints = rep_imgpoints.reshape((6,2)).astype(int)
     test_imgpoints = np.array(test_imgpoints)
