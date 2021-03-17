@@ -1,4 +1,3 @@
-import sys
 import numpy as np 
 import cv2 as cv
 
@@ -12,10 +11,6 @@ def add_kps(event, x, y, flags, param):
 
 
 if __name__ == "__main__":
-	# try:
-	# 	path = "../data/calib_images/{}.jpg".format(sys.argv[1])
-	# except:
-	# 	path = "../data/calib_images/cube1.jpg"
 
 	#images for calibration
 	img1 = cv.imread("../data/calib_images/cube1.jpg", 1)
@@ -43,16 +38,17 @@ if __name__ == "__main__":
 	# 15mm for chess board
 	objp = np.zeros((6, 3), np.float32)
 	objp[:,:2] = np.mgrid[0:3,0:2].T.reshape(-1,2)
-	objpoints = [np.tile(objp * 23,(2,1))]
+	objpoints = [np.tile(objp * 23, (2,1))]
 	imgpoints = np.array([imgpoints]).astype(np.float32)
 
 	# image and camera sensor specs
 	gray_img = cv.cvtColor(img1, cv.COLOR_BGR2GRAY)
 	imageSize = gray_img.shape[::-1]
-	apertureWidth, apertureHeight = 4.74/1.79, 4.74/1.79
+	apertureWidth, apertureHeight = 4.7/1.8, 4.7/1.8
 
 	# compute camera matrix and focal length
 	retval, cameraMatrix, distCoeffs, rvecs, tvecs = cv.calibrateCamera(objpoints, imgpoints, imageSize, None, None)
-	fovx, fovy, focalLength, principalPoint, aspectRatio = cv.calibrationMatrixValues(cameraMatrix, imageSize, apertureWidth, apertureHeight)
+	# fovx, fovy, focalLength, principalPoint, aspectRatio = cv.calibrationMatrixValues(cameraMatrix, imageSize, apertureWidth, apertureHeight)
+	print(cameraMatrix)
 
-	print("Focal Length: {}".format(focalLength))
+	print("Focal Length: {0:.5f}mm".format(focalLength))
