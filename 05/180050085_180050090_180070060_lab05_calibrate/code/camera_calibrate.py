@@ -10,95 +10,98 @@ test_imgpoints = []
 
 # callback functions
 def mark(event, x, y, flags, param):
-    if event == cv.EVENT_LBUTTONDOWN:
-        cv.circle(img,(x,y),25,(0,255,0),8)
-        test_imgpoints.append([x, y])
+	if event == cv.EVENT_LBUTTONDOWN:
+		cv.circle(img,(x,y),25,(0,255,0),8)
+		test_imgpoints.append([x, y])
 
 def add_kps(event, x, y, flags, param):
 	if event == cv.EVENT_LBUTTONDOWN:
 		imgpoints.append([x, y])
 
 if __name__ == "__main__":
-    ind = 0
-    try:
-        path = "../data/calib_images/cube{}.jpg".format(sys.argv[1])
-        ind = int(sys.argv[1])-1
-    except:
-        path = "../data/calib_images/cube1.jpg"
-    
-    #test image
-    img = cv.imread(path)
-    cv.namedWindow("mark_test_img", cv.WINDOW_NORMAL | cv.WINDOW_KEEPRATIO)
-    cv.resizeWindow("mark_test_img", 1000, 750)
-    cv.setMouseCallback("mark_test_img", mark)
-    cv.imshow("mark_test_img", img)
+	ind = 0
 
-    cv.waitKey(-1)
-    cv.destroyAllWindows()
+	path = "../../../06/180050085_180050090_180070060_lab05_AR/data/augment_book/wall1.jpg"
+	
+	#test image
+	img = cv.imread(path)
+	cv.namedWindow("mark_test_img", cv.WINDOW_NORMAL | cv.WINDOW_KEEPRATIO)
+	cv.resizeWindow("mark_test_img", 1000, 750)
+	cv.setMouseCallback("mark_test_img", mark)
+	cv.imshow("mark_test_img", img)
 
-    cv.imwrite("../data/true.jpg",img)
+	cv.waitKey(-1)
+	cv.destroyAllWindows()
 
-    #images for calibration
-    img1 = cv.imread("../data/calib_images/cube1.jpg", 1)
-    img2 = cv.imread("../data/calib_images/cube2.jpg",1)
-    img3 = cv.imread("../data/calib_images/cube3.jpg",1)
+	cv.imwrite("../data/true.jpg",img)
 
-    # take imgpoints manually
-    cv.namedWindow("calibrate_img1", cv.WINDOW_NORMAL | cv.WINDOW_KEEPRATIO)
-    cv.resizeWindow("calibrate_img1", 1000, 750)
-    cv.setMouseCallback("calibrate_img1", add_kps)
-    cv.imshow("calibrate_img1", img1)
+	#images for calibration
+	img1 = cv.imread("../../../06/180050085_180050090_180070060_lab05_AR/data/augment_book/wall1.jpg", 1)
+	img2 = cv.imread("../../../06/180050085_180050090_180070060_lab05_AR/data/augment_book/wall2.jpg",1)
+	img3 = cv.imread("../../../06/180050085_180050090_180070060_lab05_AR/data/augment_book/wall3.jpg",1)
 
-    cv.waitKey(-1)
-    cv.destroyAllWindows()
+	# take imgpoints manually
+	cv.namedWindow("calibrate_img1", cv.WINDOW_NORMAL | cv.WINDOW_KEEPRATIO)
+	cv.resizeWindow("calibrate_img1", 1000, 750)
+	cv.setMouseCallback("calibrate_img1", add_kps)
+	cv.imshow("calibrate_img1", img1)
 
-    cv.namedWindow("calibrate_img2", cv.WINDOW_NORMAL | cv.WINDOW_KEEPRATIO)
-    cv.resizeWindow("calibrate_img2", 1000, 750)
-    cv.setMouseCallback("calibrate_img2", add_kps)
-    cv.imshow("calibrate_img2", img2)
+	cv.waitKey(-1)
+	cv.destroyAllWindows()
 
-    cv.waitKey(-1)
-    cv.destroyAllWindows()
+	cv.namedWindow("calibrate_img2", cv.WINDOW_NORMAL | cv.WINDOW_KEEPRATIO)
+	cv.resizeWindow("calibrate_img2", 1000, 750)
+	cv.setMouseCallback("calibrate_img2", add_kps)
+	cv.imshow("calibrate_img2", img2)
 
-    cv.namedWindow("calibrate_img3", cv.WINDOW_NORMAL | cv.WINDOW_KEEPRATIO)
-    cv.resizeWindow("calibrate_img3", 1000, 750)
-    cv.setMouseCallback("calibrate_img3", add_kps)
-    cv.imshow("calibrate_img3", img3)
+	cv.waitKey(-1)
+	cv.destroyAllWindows()
 
-    cv.waitKey(-1)
-    cv.destroyAllWindows()
+	cv.namedWindow("calibrate_img3", cv.WINDOW_NORMAL | cv.WINDOW_KEEPRATIO)
+	cv.resizeWindow("calibrate_img3", 1000, 750)
+	cv.setMouseCallback("calibrate_img3", add_kps)
+	cv.imshow("calibrate_img3", img3)
 
-    # object points in 3D real world coordinate 
-    # 23mm for 3x3 rubix cube
-    intake = 6
-    objp = np.zeros((intake, 3), np.float32)
-    objp[:,:2] = np.mgrid[0:intake/2,0:2].T.reshape(-1,2)
-    objpoints = np.tile(objp * 23, (3, 1, 1))
-    imgpoints = np.array(imgpoints).astype(np.float32).reshape(3, intake, 2)
-    # print(objpoints.shape)
-    # print(imgpoints.shape)
+	cv.waitKey(-1)
+	cv.destroyAllWindows()
 
-    # image and camera sensor specs
-    gray_img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-    imageSize = gray_img.shape[::-1]
+	# object points in 3D real world coordinate 
+	# 23mm for 3x3 rubix cube
+	intake = 6
+	objp = np.zeros((intake, 3), np.float32)
+	objp[:,:2] = np.mgrid[0:intake/2,0:2].T.reshape(-1,2)
+	print(objp)
+	objpoints = np.tile(objp * 1, (3, 1, 1))
+	imgpoints = np.array(imgpoints).astype(np.float32).reshape(3, intake, 2)
+	# print(objpoints.shape)
+	# print(imgpoints.shape)
 
-    # compute camera matrix and focal length
-    retval, cameraMatrix, distCoeffs, rvecs, tvecs = cv.calibrateCamera(objpoints, imgpoints, imageSize, None, None)
-    objp = np.zeros((6, 3), np.float32)
-    objp[:,:2] = np.mgrid[0:3,0:2].T.reshape(-1,2)
-    test_objpoints = objp * 23
-    rep_imgpoints, jacob = cv.projectPoints(test_objpoints, rvecs[ind], tvecs[ind], cameraMatrix, distCoeffs)
+	# image and camera sensor specs
+	gray_img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+	imageSize = gray_img.shape[::-1]
 
-    rep_imgpoints = rep_imgpoints.reshape((6,2)).astype(int)
-    test_imgpoints = np.array(test_imgpoints)
-    rep_err = 0
-    for i in range(6):
-        rep_err += np.sqrt(np.sum(np.square(rep_imgpoints[i, :] - test_imgpoints[i, :])))
-    rep_err /= 6
+	# compute camera matrix and focal length
+	retval, cameraMatrix, distCoeffs, rvecs, tvecs = cv.calibrateCamera(objpoints, imgpoints, imageSize, None, None)
+	np.save("retval", retval)
+	np.save("cameraMatrix", cameraMatrix)
+	np.save("distCoeffs", distCoeffs)
+	np.save("rvecs", rvecs)
+	np.save("tvecs", tvecs)
+	objp = np.zeros((6, 3), np.float32)
+	objp[:,:2] = np.mgrid[0:3,0:2].T.reshape(-1,2)
+	test_objpoints = objp
+	rep_imgpoints, jacob = cv.projectPoints(test_objpoints, rvecs[ind], tvecs[ind], cameraMatrix, distCoeffs)
 
-    print("Reprojection Error: {}".format(rep_err))
+	rep_imgpoints = rep_imgpoints.reshape((6,2)).astype(int)
+	test_imgpoints = np.array(test_imgpoints)
+	rep_err = 0
+	for i in range(6):
+		rep_err += np.sqrt(np.sum(np.square(rep_imgpoints[i, :] - test_imgpoints[i, :])))
+	rep_err /= 6
 
-    for i in range(6):
-        cv.putText(img, 'X', tuple(rep_imgpoints[i]), cv.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 8, cv.LINE_AA) 
+	print("Reprojection Error: {}".format(rep_err))
 
-    cv.imwrite('../data/projected.jpg',img)
+	for i in range(6):
+		cv.putText(img, 'X', tuple(rep_imgpoints[i]), cv.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 8, cv.LINE_AA) 
+
+	cv.imwrite('../data/projected.jpg',img)
