@@ -86,7 +86,7 @@ if __name__ == "__main__":
 	B = args.b
 	X, Y = args.x, args.y
 	theta = args.theta
-
+	
 	objp = np.zeros((49,3), np.float32)
 	objp[:,:2] = np.mgrid[0:7,0:7].T.reshape(-1,2)
 
