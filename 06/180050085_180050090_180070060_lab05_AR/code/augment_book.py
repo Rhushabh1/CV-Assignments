@@ -31,13 +31,11 @@ def texture_book_on_img():
 	pass
 
 def draw_book_on_image(L,B,W, wall,rvec, tvec, cameraMatrix, distCoeffs, front_img, side_img):
-	front_cover_positions = np.asarray([[0,B,W], [L,B,W], [L,0,W], [0,0,W]])*0.5
+	front_cover_positions = np.asarray([[0,B,W], [L,B,W], [L,0,W], [0,0,W]])*10
 
-	back_cover_positions = np.asarray([[0,B,0], [L,B,0], [L,0,0], [0,0,0]])*0.5
+	back_cover_positions = np.asarray([[0,B,0], [L,B,0], [L,0,0], [0,0,0]])*10
 
 	points_needed = np.vstack((front_cover_positions,back_cover_positions))
-
-	print(points_needed)
 
 
 	rep_imgpoints, jacob = cv.projectPoints(points_needed, rvec, tvec, cameraMatrix, distCoeffs)
@@ -48,11 +46,11 @@ def draw_book_on_image(L,B,W, wall,rvec, tvec, cameraMatrix, distCoeffs, front_i
 	# Now warping the images
 
 
-	new_front_cover = rep_imgpoints[4:]
+	new_front_cover = rep_imgpoints[:4]
 
 
 
-	side_cover = np.vstack((rep_imgpoints[4:6],rep_imgpoints[1::-1]))
+	side_cover = np.vstack((rep_imgpoints[7:5:-1],rep_imgpoints[2:4]))
 
 	# print(side_cover)
 
@@ -74,10 +72,10 @@ def draw_book_on_image(L,B,W, wall,rvec, tvec, cameraMatrix, distCoeffs, front_i
 	img = cv.line(img, tuple(rep_imgpoints[3]), tuple(rep_imgpoints[7]),(0,0,255),4)
 
 	
-	## Warp for side cover
+	# ## Warp for side cover
 	l_side = side_img.shape[0] - 1
 	b_side = side_img.shape[1] - 1
-	src_sidecover = np.asarray([[0,l_side], [0,0], [b_side, 0], [b_side,l_side] ]).astype(np.float32)
+	src_sidecover = np.asarray([[b_side,l_side],[b_side,0] , [0, 0], [0,l_side]]).astype(np.float32)
 
 	M = cv.getPerspectiveTransform(src_sidecover, side_cover.astype(np.float32))
 
@@ -93,9 +91,7 @@ def draw_book_on_image(L,B,W, wall,rvec, tvec, cameraMatrix, distCoeffs, front_i
 
 	## warp for front cover
 	max_front_pix = front_img.shape[0] - 1
-	src_frontcover = np.asarray([[0,max_front_pix],[max_front_pix, max_front_pix], [max_front_pix, 0], [0,0]]).astype(np.float32)
-
-	
+	src_frontcover = np.asarray([[max_front_pix,0],[max_front_pix, max_front_pix],[0,max_front_pix],[0,0]]).astype(np.float32)	
 	M = cv.getPerspectiveTransform(src_frontcover, new_front_cover.astype(np.float32))
 
 	final_image = cv.warpPerspective(front_img, M, (img.shape[1], img.shape[0]))
