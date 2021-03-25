@@ -30,6 +30,70 @@ different planes of the book'''
 def texture_book_on_img():
 	pass
 
+def draw_book_on_image(L,B,W, wall,rvec, tvec, cameraMatrix, distCoeffs, front_img, side_img):
+	front_cover_positions = np.asarray([[0,B,W], [L,B,W], [L,0,W], [0,0,W]])*0.5
+
+	back_cover_positions = np.asarray([[0,B,0], [L,B,0], [L,0,0], [0,0,0]])*0.5
+
+	points_needed = np.vstack((front_cover_positions,back_cover_positions))
+
+	rep_imgpoints, jacob = cv.projectPoints(points_needed, rvec, tvec, cameraMatrix, distCoeffs)
+
+	rep_imgpoints = rep_imgpoints.squeeze()
+	rep_imgpoints = np.around(rep_imgpoints).astype(np.int32)
+
+	# Now warping the images
+
+
+	new_front_cover = rep_imgpoints[:4]
+
+	new_back_cover = rep_imgpoints[4:]
+	side_cover = np.vstack((rep_imgpoints[4:6],rep_imgpoints[:2:-1]))
+
+
+	img = wall
+
+
+	img = cv.line(img, tuple(rep_imgpoints[0]), tuple(rep_imgpoints[1]),(0,0,255),4)
+	img = cv.line(img, tuple(rep_imgpoints[1]), tuple(rep_imgpoints[2]),(0,0,255),4)
+	img = cv.line(img, tuple(rep_imgpoints[2]), tuple(rep_imgpoints[3]),(0,0,255),4)
+	img = cv.line(img, tuple(rep_imgpoints[3]), tuple(rep_imgpoints[0]),(0,0,255),4)
+	img = cv.line(img, tuple(rep_imgpoints[4]), tuple(rep_imgpoints[5]),(0,0,255),4)
+	img = cv.line(img, tuple(rep_imgpoints[5]), tuple(rep_imgpoints[6]),(0,0,255),4)
+	img = cv.line(img, tuple(rep_imgpoints[6]), tuple(rep_imgpoints[7]),(0,0,255),4)
+	img = cv.line(img, tuple(rep_imgpoints[7]), tuple(rep_imgpoints[4]),(0,0,255),4)
+	img = cv.line(img, tuple(rep_imgpoints[0]), tuple(rep_imgpoints[4]),(0,0,255),4)
+	img = cv.line(img, tuple(rep_imgpoints[1]), tuple(rep_imgpoints[5]),(0,0,255),4)
+	img = cv.line(img, tuple(rep_imgpoints[2]), tuple(rep_imgpoints[6]),(0,0,255),4)
+	img = cv.line(img, tuple(rep_imgpoints[3]), tuple(rep_imgpoints[7]),(0,0,255),4)
+
+	## warp for front cover
+	max_front_pix = front_img.shape[0] - 1
+	src_frontcover = np.asarray([[0,max_front_pix],[max_front_pix, max_front_pix], [max_front_pix, 0], [0,0]]).astype(np.float32)
+
+	
+	print(src_frontcover.shape)
+	M = cv.getPerspectiveTransform(src_frontcover, new_front_cover.astype(np.float32))
+
+	final_image = cv.warpPerspective(front_img, M, tuple(img.shape[:2:-1]))
+
+
+	mask = np.zeros(img.shape)
+
+	sum_pixels = final_image.sum(axis = 2)
+
+	mask = sum_pixels > 0
+
+	img[mask] = final_image[mask]
+
+
+
+
+
+
+	return img
+
+	
 
 
 
@@ -52,48 +116,16 @@ if __name__ == "__main__":
 	X, Y = args.x, args.y
 	theta = args.theta
 
-	objp = np.zeros((36,3), np.float32)
-	objp[:,:2] = np.mgrid[0:6,0:6].T.reshape(-1,2)
-
 	cameraMatrix, distCoeffs, retval, rvecs, tvecs = load_calibration_matrix(file)
 	front_img, side_img, walls = get_data(file)
 
-	## ATTEMPT 1: FOR 1 WALL
-	front_cover_positions = np.asarray([[0,B,W], [L,B,W], [L,0,W], [0,0,W]])*0.5
-
-	back_cover_positions = np.asarray([[0,B,0], [L,B,0], [L,0,0], [0,0,0]])*0.5
+	print(side_img.shape)
 
 
-	points_needed = np.vstack((front_cover_positions,back_cover_positions))
-
-	print(points_needed.shape)
 	for i in range(3):
 		wall = walls[i]
 
-		rep_imgpoints, jacob = cv.projectPoints(points_needed, rvecs[i], tvecs[i], cameraMatrix, distCoeffs)
-
-		new_front_cover = rep_imgpoints[:4]
-
-		new_back_cover = rep_imgpoints[4:]
-
-		side_cover = np.vstack((rep_imgpoints[4:6],rep_imgpoints[:2:-1]))
-		img = wall
-
-
-		rep_imgpoints = np.around(rep_imgpoints.squeeze()).astype(np.int32)
-		img = cv.line(img, tuple(rep_imgpoints[0]), tuple(rep_imgpoints[1]),(0,0,255),4)
-		img = cv.line(img, tuple(rep_imgpoints[1]), tuple(rep_imgpoints[2]),(0,0,255),4)
-		img = cv.line(img, tuple(rep_imgpoints[2]), tuple(rep_imgpoints[3]),(0,0,255),4)
-		img = cv.line(img, tuple(rep_imgpoints[3]), tuple(rep_imgpoints[0]),(0,0,255),4)
-		img = cv.line(img, tuple(rep_imgpoints[4]), tuple(rep_imgpoints[5]),(0,0,255),4)
-		img = cv.line(img, tuple(rep_imgpoints[5]), tuple(rep_imgpoints[6]),(0,0,255),4)
-		img = cv.line(img, tuple(rep_imgpoints[6]), tuple(rep_imgpoints[7]),(0,0,255),4)
-		img = cv.line(img, tuple(rep_imgpoints[7]), tuple(rep_imgpoints[4]),(0,0,255),4)
-		img = cv.line(img, tuple(rep_imgpoints[0]), tuple(rep_imgpoints[4]),(0,0,255),4)
-		img = cv.line(img, tuple(rep_imgpoints[1]), tuple(rep_imgpoints[5]),(0,0,255),4)
-		img = cv.line(img, tuple(rep_imgpoints[2]), tuple(rep_imgpoints[6]),(0,0,255),4)
-		img = cv.line(img, tuple(rep_imgpoints[3]), tuple(rep_imgpoints[7]),(0,0,255),4)
-
+		img = draw_book_on_image(L, B,W, wall,rvecs[i], tvecs[i], cameraMatrix, distCoeffs, front_img, side_img)
 
 		height, width = img.shape[:2]
 		cv.namedWindow('jpg', cv.WINDOW_NORMAL)
@@ -103,6 +135,8 @@ if __name__ == "__main__":
 		cv.waitKey(-1)
 
 		cv.destroyAllWindows()
+
+		
 
 	
 
