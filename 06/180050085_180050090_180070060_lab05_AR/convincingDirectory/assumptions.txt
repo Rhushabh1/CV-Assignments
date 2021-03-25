@@ -1,0 +1,5 @@
+q1) Following assumptions were made in this question:
+-> top left corner of the back side of book is the origin of world coordinate system
+-> unit of length, breadth and width is width of chess block (i.e. value x denotes x*chess_block_width)
+-> width of chess block in world coordinate system is 15mm
+-> users need to pass arguments such that none of book's image coordinate goes negative or beyond the image shape 
