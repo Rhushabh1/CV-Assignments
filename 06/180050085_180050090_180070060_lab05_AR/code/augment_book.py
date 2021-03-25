@@ -37,6 +37,9 @@ def draw_book_on_image(L,B,W, wall,rvec, tvec, cameraMatrix, distCoeffs, front_i
 
 	points_needed = np.vstack((front_cover_positions,back_cover_positions))
 
+	print(points_needed)
+
+
 	rep_imgpoints, jacob = cv.projectPoints(points_needed, rvec, tvec, cameraMatrix, distCoeffs)
 
 	rep_imgpoints = rep_imgpoints.squeeze()
@@ -45,10 +48,13 @@ def draw_book_on_image(L,B,W, wall,rvec, tvec, cameraMatrix, distCoeffs, front_i
 	# Now warping the images
 
 
-	new_front_cover = rep_imgpoints[:4]
+	new_front_cover = rep_imgpoints[4:]
 
-	new_back_cover = rep_imgpoints[4:]
-	side_cover = np.vstack((rep_imgpoints[4:6],rep_imgpoints[:2:-1]))
+
+
+	side_cover = np.vstack((rep_imgpoints[4:6],rep_imgpoints[1::-1]))
+
+	# print(side_cover)
 
 
 	img = wall
@@ -67,18 +73,15 @@ def draw_book_on_image(L,B,W, wall,rvec, tvec, cameraMatrix, distCoeffs, front_i
 	img = cv.line(img, tuple(rep_imgpoints[2]), tuple(rep_imgpoints[6]),(0,0,255),4)
 	img = cv.line(img, tuple(rep_imgpoints[3]), tuple(rep_imgpoints[7]),(0,0,255),4)
 
-	## warp for front cover
-	max_front_pix = front_img.shape[0] - 1
-	src_frontcover = np.asarray([[0,max_front_pix],[max_front_pix, max_front_pix], [max_front_pix, 0], [0,0]]).astype(np.float32)
-
 	
-	print(src_frontcover.shape)
-	M = cv.getPerspectiveTransform(src_frontcover, new_front_cover.astype(np.float32))
+	## Warp for side cover
+	l_side = side_img.shape[0] - 1
+	b_side = side_img.shape[1] - 1
+	src_sidecover = np.asarray([[0,l_side], [0,0], [b_side, 0], [b_side,l_side] ]).astype(np.float32)
 
-	final_image = cv.warpPerspective(front_img, M, tuple(img.shape[:2:-1]))
+	M = cv.getPerspectiveTransform(src_sidecover, side_cover.astype(np.float32))
 
-
-	mask = np.zeros(img.shape)
+	final_image = cv.warpPerspective(side_img, M, (img.shape[1], img.shape[0]))
 
 	sum_pixels = final_image.sum(axis = 2)
 
@@ -88,7 +91,23 @@ def draw_book_on_image(L,B,W, wall,rvec, tvec, cameraMatrix, distCoeffs, front_i
 
 
 
+	## warp for front cover
+	max_front_pix = front_img.shape[0] - 1
+	src_frontcover = np.asarray([[0,max_front_pix],[max_front_pix, max_front_pix], [max_front_pix, 0], [0,0]]).astype(np.float32)
 
+	
+	M = cv.getPerspectiveTransform(src_frontcover, new_front_cover.astype(np.float32))
+
+	final_image = cv.warpPerspective(front_img, M, (img.shape[1], img.shape[0]))
+
+
+	mask = np.zeros(img.shape)
+
+	sum_pixels = final_image.sum(axis = 2)
+
+	mask = sum_pixels > 0
+
+	img[mask] = final_image[mask]
 
 
 	return img
@@ -118,8 +137,6 @@ if __name__ == "__main__":
 
 	cameraMatrix, distCoeffs, retval, rvecs, tvecs = load_calibration_matrix(file)
 	front_img, side_img, walls = get_data(file)
-
-	print(side_img.shape)
 
 
 	for i in range(3):
