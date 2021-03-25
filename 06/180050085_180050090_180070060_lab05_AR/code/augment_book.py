@@ -8,7 +8,7 @@ import os
 def get_data(file):
 	front_img = cv.imread(os.path.join(file, "front.png"), 1)
 	side_img = cv.imread(os.path.join(file, "side.png"), 1)
-	walls = [cv.imread(os.path.join(file, "wall{}.jpg".format(i)), 1) for i in range(1,3)]
+	walls = [cv.imread(os.path.join(file, "wall{}.jpg".format(i)), 1) for i in range(1,4)]
 	return front_img, side_img, walls
 
 def load_calibration_matrix(file):
@@ -67,39 +67,42 @@ if __name__ == "__main__":
 	points_needed = np.vstack((front_cover_positions,back_cover_positions))
 
 	print(points_needed.shape)
-	rep_imgpoints, jacob = cv.projectPoints(points_needed, rvecs[1], tvecs[1], cameraMatrix, distCoeffs)
+	for i in range(3):
+		wall = walls[i]
 
-	new_front_cover = rep_imgpoints[:4]
+		rep_imgpoints, jacob = cv.projectPoints(points_needed, rvecs[i], tvecs[i], cameraMatrix, distCoeffs)
 
-	new_back_cover = rep_imgpoints[4:]
+		new_front_cover = rep_imgpoints[:4]
 
-	side_cover = np.vstack((rep_imgpoints[4:6],rep_imgpoints[:2:-1]))
-	img = walls[1]
+		new_back_cover = rep_imgpoints[4:]
 
-
-	rep_imgpoints = np.around(rep_imgpoints.squeeze()).astype(np.int32)
-	img = cv.line(img, tuple(rep_imgpoints[0]), tuple(rep_imgpoints[1]),(0,0,255),4)
-	img = cv.line(img, tuple(rep_imgpoints[1]), tuple(rep_imgpoints[1]),(0,0,255),4)
-	img = cv.line(img, tuple(rep_imgpoints[2]), tuple(rep_imgpoints[1]),(0,0,255),4)
-	img = cv.line(img, tuple(rep_imgpoints[3]), tuple(rep_imgpoints[0]),(0,0,255),4)
-	img = cv.line(img, tuple(rep_imgpoints[4]), tuple(rep_imgpoints[5]),(0,0,255),4)
-	img = cv.line(img, tuple(rep_imgpoints[5]), tuple(rep_imgpoints[6]),(0,0,255),4)
-	img = cv.line(img, tuple(rep_imgpoints[6]), tuple(rep_imgpoints[7]),(0,0,255),4)
-	img = cv.line(img, tuple(rep_imgpoints[7]), tuple(rep_imgpoints[4]),(0,0,255),4)
-	img = cv.line(img, tuple(rep_imgpoints[0]), tuple(rep_imgpoints[4]),(0,0,255),4)
-	img = cv.line(img, tuple(rep_imgpoints[1]), tuple(rep_imgpoints[5]),(0,0,255),4)
-	img = cv.line(img, tuple(rep_imgpoints[2]), tuple(rep_imgpoints[6]),(0,0,255),4)
-	img = cv.line(img, tuple(rep_imgpoints[3]), tuple(rep_imgpoints[7]),(0,0,255),4)
+		side_cover = np.vstack((rep_imgpoints[4:6],rep_imgpoints[:2:-1]))
+		img = wall
 
 
-	height, width = img.shape[:2]
-	cv.namedWindow('jpg', cv.WINDOW_NORMAL)
+		rep_imgpoints = np.around(rep_imgpoints.squeeze()).astype(np.int32)
+		img = cv.line(img, tuple(rep_imgpoints[0]), tuple(rep_imgpoints[1]),(0,0,255),4)
+		img = cv.line(img, tuple(rep_imgpoints[1]), tuple(rep_imgpoints[2]),(0,0,255),4)
+		img = cv.line(img, tuple(rep_imgpoints[2]), tuple(rep_imgpoints[3]),(0,0,255),4)
+		img = cv.line(img, tuple(rep_imgpoints[3]), tuple(rep_imgpoints[0]),(0,0,255),4)
+		img = cv.line(img, tuple(rep_imgpoints[4]), tuple(rep_imgpoints[5]),(0,0,255),4)
+		img = cv.line(img, tuple(rep_imgpoints[5]), tuple(rep_imgpoints[6]),(0,0,255),4)
+		img = cv.line(img, tuple(rep_imgpoints[6]), tuple(rep_imgpoints[7]),(0,0,255),4)
+		img = cv.line(img, tuple(rep_imgpoints[7]), tuple(rep_imgpoints[4]),(0,0,255),4)
+		img = cv.line(img, tuple(rep_imgpoints[0]), tuple(rep_imgpoints[4]),(0,0,255),4)
+		img = cv.line(img, tuple(rep_imgpoints[1]), tuple(rep_imgpoints[5]),(0,0,255),4)
+		img = cv.line(img, tuple(rep_imgpoints[2]), tuple(rep_imgpoints[6]),(0,0,255),4)
+		img = cv.line(img, tuple(rep_imgpoints[3]), tuple(rep_imgpoints[7]),(0,0,255),4)
 
-	cv.resizeWindow('jpg', int(width/4), int(height/4))
-	cv.imshow("jpg", img)
-	cv.waitKey(-1)
 
-	cv.destroyAllWindows()
+		height, width = img.shape[:2]
+		cv.namedWindow('jpg', cv.WINDOW_NORMAL)
+
+		cv.resizeWindow('jpg', int(width/4), int(height/4))
+		cv.imshow("jpg", img)
+		cv.waitKey(-1)
+
+		cv.destroyAllWindows()
 
 	
 
