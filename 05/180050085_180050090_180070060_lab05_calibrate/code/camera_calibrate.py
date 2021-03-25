@@ -89,7 +89,7 @@ if __name__ == "__main__":
 	np.save("tvecs", tvecs)
 	objp = np.zeros((6, 3), np.float32)
 	objp[:,:2] = np.mgrid[0:3,0:2].T.reshape(-1,2)
-	test_objpoints = objp * 23
+	test_objpoints = objp
 	rep_imgpoints, jacob = cv.projectPoints(test_objpoints, rvecs[ind], tvecs[ind], cameraMatrix, distCoeffs)
 
 	rep_imgpoints = rep_imgpoints.reshape((6,2)).astype(int)

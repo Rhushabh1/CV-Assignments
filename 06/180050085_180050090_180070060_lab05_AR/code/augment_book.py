@@ -13,7 +13,13 @@ def get_data(file):
 
 def load_calibration_matrix(file):
 	final_path_folder = os.path.join(file, "calib")
+	cameraMatrix = np.load(os.path.join(final_path_folder, "cameraMatrix.npy"))
+	distCoeffs = np.load(os.path.join(final_path_folder, "distCoeffs.npy"))
+	retval = np.load(os.path.join(final_path_folder, "retval.npy"))
+	rvecs = np.load(os.path.join(final_path_folder, "rvecs.npy"))
+	tvecs = np.load(os.path.join(final_path_folder, "tvecs.npy"))
 
+	return cameraMatrix, distCoeffs, retval, rvecs, tvecs
 '''Draw the front cover along with 
 	the boundary of the implicit cuboid'''
 def draw_book_on_img():
@@ -23,46 +29,6 @@ def draw_book_on_img():
 different planes of the book'''
 def texture_book_on_img():
 	pass
-
-def calibrate_camera(file):
-	objp = np.zeros((64,3), np.float32)
-	objp[:,:2] = np.mgrid[0:8,0:8].T.reshape(-1,2)
-
-	objpoints = []
-	imgpoints = []
-
-	for i in range(1,5):
-		path = os.path.join(file, f"wall{i}.jpg")
-		img = cv.imread(path,1)
-
-		
-
-		gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-
-		ret, corners = cv.findChessboardCorners(gray, (8,8), None)
-
-		if ret == True:
-			objpoints.append(objp)
-			corners2 = cv.cornerSubPix(gray,corners, (11,11), (-1,-1), criteria)
-
-			imgpoints.apppend(corners)
-
-			cv.drawChessboardCorners(img, (8,8), corners2, ret)
-			cv.imshow('img', img)
-			cv.waitKey(500)
-	
-	ret, mtx, dist, rvecs, tvecs = cv.calibrateCamera(objpoints, imgpoints, gray.shape[::-1], None, None)
-
-	final_folderpath = os.path.join(file, "calib")
-
-	np.save(os.path.join(final_folderpath,"ret.npy"), ret)
-	np.save(os.path.join(final_folderpath,"mtx.npy"), mtx)
-	np.save(os.path.join(final_folderpath,"dist.npy"), dist)
-	np.save(os.path.join(final_folderpath,"rvecs.npy"), rvecs)
-	np.save(os.path.join(final_folderpath,"tvecs.npy"), tvecs)
-
-	return ret, mtx, dist, rvecs, tvecs
-
 
 
 
@@ -83,77 +49,59 @@ if __name__ == "__main__":
 	L = args.l
 	B = args.b
 	W = args.w
-	B = args.b
 	X, Y = args.x, args.y
 	theta = args.theta
 
 	objp = np.zeros((36,3), np.float32)
 	objp[:,:2] = np.mgrid[0:6,0:6].T.reshape(-1,2)
 
-	objpoints = []
-	imgpoints = []
+	cameraMatrix, distCoeffs, retval, rvecs, tvecs = load_calibration_matrix(file)
+	front_img, side_img, walls = get_data(file)
 
-	for i in range(1,5):
-		path = os.path.join(file, f"wall{i}.jpg")
+	## ATTEMPT 1: FOR 1 WALL
+	front_cover_positions = np.asarray([[0,B,W], [L,B,W], [L,0,W], [0,0,W]])*0.5
 
-		img = cv.imread(path,1)
+	back_cover_positions = np.asarray([[0,B,0], [L,B,0], [L,0,0], [0,0,0]])*0.5
 
-		
-		gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-		print(path)
 
-		ret, corners = cv.findChessboardCorners(gray, (6,6), cv.CV_CALIB_CB_ADAPTIVE_THRESH | cv.CV_CALIB_CB_FILTER_QUADS)
-		criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
-		print(ret)
+	points_needed = np.vstack((front_cover_positions,back_cover_positions))
 
-		if ret == True:
-			objpoints.append(objp)
-			corners2 = cv.cornerSubPix(gray,corners, (11,11), (-1,-1), criteria)
+	print(points_needed.shape)
+	rep_imgpoints, jacob = cv.projectPoints(points_needed, rvecs[1], tvecs[1], cameraMatrix, distCoeffs)
 
-			imgpoints.apppend(corners)
+	new_front_cover = rep_imgpoints[:4]
 
-			cv.drawChessboardCorners(img, (6,6), corners2, ret)
-			cv.imshow('img', img)
-			cv.waitKey(-1)
-	
-	ret, mtx, dist, rvecs, tvecs = cv.calibrateCamera(objpoints, imgpoints, gray.shape[::-1], None, None)
+	new_back_cover = rep_imgpoints[4:]
 
-	final_folderpath = os.path.join(file, "calib")
+	side_cover = np.vstack((rep_imgpoints[4:6],rep_imgpoints[:2:-1]))
+	img = walls[1]
 
-	np.save(os.path.join(final_folderpath,"ret.npy"), ret)
-	np.save(os.path.join(final_folderpath,"mtx.npy"), mtx)
-	np.save(os.path.join(final_folderpath,"dist.npy"), dist)
-	np.save(os.path.join(final_folderpath,"rvecs.npy"), rvecs)
-	np.save(os.path.join(final_folderpath,"tvecs.npy"), tvecs)
+
+	rep_imgpoints = np.around(rep_imgpoints.squeeze()).astype(np.int32)
+	img = cv.line(img, tuple(rep_imgpoints[0]), tuple(rep_imgpoints[1]),(0,0,255),4)
+	img = cv.line(img, tuple(rep_imgpoints[1]), tuple(rep_imgpoints[1]),(0,0,255),4)
+	img = cv.line(img, tuple(rep_imgpoints[2]), tuple(rep_imgpoints[1]),(0,0,255),4)
+	img = cv.line(img, tuple(rep_imgpoints[3]), tuple(rep_imgpoints[0]),(0,0,255),4)
+	img = cv.line(img, tuple(rep_imgpoints[4]), tuple(rep_imgpoints[5]),(0,0,255),4)
+	img = cv.line(img, tuple(rep_imgpoints[5]), tuple(rep_imgpoints[6]),(0,0,255),4)
+	img = cv.line(img, tuple(rep_imgpoints[6]), tuple(rep_imgpoints[7]),(0,0,255),4)
+	img = cv.line(img, tuple(rep_imgpoints[7]), tuple(rep_imgpoints[4]),(0,0,255),4)
+	img = cv.line(img, tuple(rep_imgpoints[0]), tuple(rep_imgpoints[4]),(0,0,255),4)
+	img = cv.line(img, tuple(rep_imgpoints[1]), tuple(rep_imgpoints[5]),(0,0,255),4)
+	img = cv.line(img, tuple(rep_imgpoints[2]), tuple(rep_imgpoints[6]),(0,0,255),4)
+	img = cv.line(img, tuple(rep_imgpoints[3]), tuple(rep_imgpoints[7]),(0,0,255),4)
+
+
+	height, width = img.shape[:2]
+	cv.namedWindow('jpg', cv.WINDOW_NORMAL)
+
+	cv.resizeWindow('jpg', int(width/4), int(height/4))
+	cv.imshow("jpg", img)
+	cv.waitKey(-1)
 
 	cv.destroyAllWindows()
-	# front_img, side_img, walls = get_data(file)
+
 	
-	# # set object points in WCS
-	# objp = np.zeros((3*3, 3), np.float32)
-	# objp[:, :2] = np.mgrid[0:3, 0:3].T.reshape(-1, 2)
-	# axis = np.float32([[3, 0, 0], [0, 3, 0], [0, 0, -3]]).reshape(-1, 3)
-	# # book = np.float32([])
 
-	# # criteria for cv2.cornerSubPix() function
-	# criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
-	# for wall in walls:
-	# 	gray_wall = cv.cvtColor(wall, cv.COLOR_BGR2GRAY)
-	# 	cv.imshow("gray", gray_wall)
-	# 	cv.waitKey(-1)
-	# 	cv.destroyAllWindows()
-	# 	# find initialised corners
-	# 	ret, corners = cv.findCirclesGrid(gray_wall, (3, 3), None)
-	# 	print(ret, corners)
-	# 	# if ret:
-	# # 		# refine corners accurately
-	# # 		new_corners = cv.cornerSubPix(gray_wall, corners, (11, 11), (-1, -1), criteria)
-	# # 		# find the rotation and translation vectors
-	# # 		ret, rvecs, tvecs = cv.SolvePnP(objpoints, new_corners, cameraMatrix, distCoeffs)
-	# # 		# project #D points onto image
-	# # 		imgpoints, jacob = cv.projectPoints(book, rvecs, tvecs, cameraMatrix, distCoeffs)
 
-	# # 		AR_img = draw_book_on_img(wall, new_corners, imgpoints)
-	# # 		cv.namedWindow("Wall", cv.WINDOW_NORMAL | cv.WINDOW_KEEPRATIO)
-	# # 		cv.resizeWindow("Wall", 1000, 750)
-	# # 		cv.imshow("Wall", AR_img)
+
