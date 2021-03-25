@@ -36,9 +36,9 @@ def draw_book_on_img(L, B, W, X, Y, theta, wall, rvec, tvec, cameraMatrix, distC
 	x_1,y_1 = np.meshgrid(x,y)
 	for i in range(2):
 		for j in range(2):
-			r = np.matmul(R,np.array([x_1[i,j],y_1[i,j]]).reshape((2,1)))
-			x_1[i,j] = r[0,0]+X
-			y_1[i,j] = r[1,0]+Y
+			r = np.matmul(R,np.array([x_1[i,j]-L/2,y_1[i,j]-B/2]).reshape((2,1)))
+			x_1[i,j] = r[0,0]+L/2+X
+			y_1[i,j] = r[1,0]+B/2+Y
 
 	front_cover_positions = np.asarray([[x_1[1,0],y_1[1,0],W], [x_1[1,1],y_1[1,1],W], [x_1[0,1],y_1[0,1],W], [x_1[0,0],y_1[0,0],W]])*15
 
