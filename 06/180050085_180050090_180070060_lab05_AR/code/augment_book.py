@@ -8,7 +8,7 @@ import os
 def get_data(file):
 	front_img = cv.imread(os.path.join(file, "front.png"), 1)
 	side_img = cv.imread(os.path.join(file, "side.png"), 1)
-	walls = [cv.imread(os.path.join(file, "wall{}.jpg".format(i)), 1) for i in range(1,4)]
+	walls = [cv.imread(os.path.join(file, "wall{}.jpg".format(i)), 1) for i in range(1,5)]
 	return front_img, side_img, walls
 
 def load_calibration_matrix(file):
@@ -138,7 +138,7 @@ if __name__ == "__main__":
 	front_img, side_img, walls = get_data(file)
 
 
-	for i in range(3):
+	for i in range(4):
 		wall = walls[i]
 
 		img,front_cover,side_cover = draw_book_on_img(L, B, W, X, Y, theta, wall,rvecs[i], tvecs[i], cameraMatrix, distCoeffs)
