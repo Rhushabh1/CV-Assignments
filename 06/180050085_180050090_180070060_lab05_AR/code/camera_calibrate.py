@@ -68,9 +68,9 @@ if __name__ == "__main__":
     # compute camera matrix and focal length
     ret, mtx, dist, rvecs, tvecs = cv.calibrateCamera(objpoints, imgpoints, imageSize, None, None)
     
-    np.save("../data/augment_book/calib/ret.npy", ret)
-    np.save("../data/augment_book/calib/mtx.npy", mtx)
-    np.save("../data/augment_book/calib/dist.npy", dist)
+    np.save("../data/augment_book/calib/retval.npy", ret)
+    np.save("../data/augment_book/calib/cameraMatrix.npy", mtx)
+    np.save("../data/augment_book/calib/distCoeffs.npy", dist)
     np.save("../data/augment_book/calib/rvecs.npy", rvecs)
     np.save("../data/augment_book/calib/tvecs.npy", tvecs)
 
