@@ -87,21 +87,22 @@ if __name__ == "__main__":
 	X, Y = args.x, args.y
 	theta = args.theta
 
-	objp = np.zeros((49,3), np.float32)
-	objp[:,:2] = np.mgrid[0:7,0:7].T.reshape(-1,2)
+	objp = np.zeros((36,3), np.float32)
+	objp[:,:2] = np.mgrid[0:6,0:6].T.reshape(-1,2)
 
 	objpoints = []
 	imgpoints = []
 
-	for i in range(1,4):
+	for i in range(1,5):
 		path = os.path.join(file, f"wall{i}.jpg")
 
 		img = cv.imread(path,1)
 
 		
 		gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+		print(path)
 
-		ret, corners = cv.findChessboardCorners(gray, (7,7), None)
+		ret, corners = cv.findChessboardCorners(gray, (6,6), cv.CV_CALIB_CB_ADAPTIVE_THRESH | cv.CV_CALIB_CB_FILTER_QUADS)
 		criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
 		print(ret)
 
@@ -111,7 +112,7 @@ if __name__ == "__main__":
 
 			imgpoints.apppend(corners)
 
-			cv.drawChessboardCorners(img, (7,7), corners2, ret)
+			cv.drawChessboardCorners(img, (6,6), corners2, ret)
 			cv.imshow('img', img)
 			cv.waitKey(-1)
 	
