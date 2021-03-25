@@ -24,10 +24,27 @@ def load_calibration_matrix(file):
 
 '''Draw the front cover along with 
 	the boundary of the implicit cuboid'''
-def draw_book_on_img(L,B,W, wall,rvec, tvec, cameraMatrix, distCoeffs):
-	front_cover_positions = np.asarray([[0,B,W], [L,B,W], [L,0,W], [0,0,W]])*10
+def draw_book_on_img(L, B, W, X, Y, theta, wall, rvec, tvec, cameraMatrix, distCoeffs):
 
-	back_cover_positions = np.asarray([[0,B,0], [L,B,0], [L,0,0], [0,0,0]])*10
+	theta = (np.pi*theta)/180
+	R = np.asarray([[np.cos(theta),np.sin(theta)], [-1*np.sin(theta),np.cos(theta)]])
+	
+	X = X*7/100
+	Y = Y*7/100
+	x = np.array([0,L])
+	y = np.array([0,B])
+	x_1,y_1 = np.meshgrid(x,y)
+	for i in range(2):
+		for j in range(2):
+			r = np.matmul(R,np.array([x_1[i,j],y_1[i,j]]).reshape((2,1)))
+			x_1[i,j] = r[0,0]+X
+			y_1[i,j] = r[1,0]+Y
+
+	front_cover_positions = np.asarray([[x_1[1,0],y_1[1,0],W], [x_1[1,1],y_1[1,1],W], [x_1[0,1],y_1[0,1],W], [x_1[0,0],y_1[0,0],W]])*15
+
+	# print(front_cover_positions)
+
+	back_cover_positions = np.asarray([[x_1[1,0],y_1[1,0],0], [x_1[1,1],y_1[1,1],0], [x_1[0,1],y_1[0,1],0], [x_1[0,0],y_1[0,0],0]])*15
 
 	points_needed = np.vstack((front_cover_positions,back_cover_positions))
 
@@ -124,7 +141,7 @@ if __name__ == "__main__":
 	for i in range(3):
 		wall = walls[i]
 
-		img,front_cover,side_cover = draw_book_on_img(L, B,W, wall,rvecs[i], tvecs[i], cameraMatrix, distCoeffs)
+		img,front_cover,side_cover = draw_book_on_img(L, B, W, X, Y, theta, wall,rvecs[i], tvecs[i], cameraMatrix, distCoeffs)
 		img = texture_book_on_img(img, front_cover, side_cover, front_img, side_img) 
 
 		height, width = img.shape[:2]
