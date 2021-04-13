@@ -1,0 +1,15 @@
+***Weak Supervision***
+
+Plan at hand : We use mpjpe for the expected vs actual 2-dimensional points instead.
+
+We get the 3d point as the output from the model as we did before, and then pass it through the extrinsic and intrinsic camera matrix to obtain the expected joint_2d_2
+
+## Losses Observed
+
+1.   Regularization = 0.1 Train Loss = 0.23  Test Loss = 0.302
+2.   Regularization = 0.01 Train Loss = 0.15  Test Loss = 0.42
+3.   Regularization = 0.001 Train Loss = 0.1 Test Loss = 0.84
+
+## Why add regularization?
+
+We have the value z in the 3d coordinates that we get which is being divided to obtain the 2d coordinate and therefore to obtain the loss function while training. Hence the chances of exploding gradients and therefore exploding weights are high, therefore there must be some penalty for high weights to ensure the results obtained are appropriate. Else, while using no decay, we get a lower train loss ie. around 0.06 but a very high test loss at around 120. Using momentum might not be the best idea too over here, again due to gradient explosion which could lead to a dominating gradient for a particular weight.

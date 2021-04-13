@@ -1,52 +1,17 @@
-import numpy as np 
-import matplotlib.pyplot as plt 
-import pandas as pd 
-import pickle
-
 import torch
-from torch import Tensor
-from torch.utils.data import TensorDataset, Dataset, DataLoader, random_split
-from torchvision import transforms
+import pickle
+import os
 
-import torch.nn as nn
-import torch.nn.functional as functional
-import torch.optim as optim
-
-from training import LiftModel, evaluate, cal_mpjpe, run_epoch
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
-
+import training
 if __name__ == "__main__":
+	path = "../"
 
-    torch.manual_seed(0)
+	device = "cpu"
 
-    TEST_FILE = "data_test_lift.pkl"
-    # TEST_FILE = "data_train_lift.pkl"
-    with open(TEST_FILE, 'rb') as f:
-        data = pickle.load(f)
 
-    FILEPATH = "liftModel"
-
-    model = LiftModel(dropout = 0.5).to(device)
-    model.load_state_dict(torch.load(FILEPATH, map_location = device))
-
-    BATCH_SIZE = 64
-
-    focal_len = data["focal_len_1"]
-    joint_2d = data["joint_2d_1"]
-    joint_3d = data["joint_3d"]
-
-    joint_2d_tensor = torch.Tensor(joint_2d)
-    joint_3d_tensor = torch.Tensor(joint_3d)
-
-    test_set = TensorDataset(joint_2d_tensor, joint_3d_tensor)
-
-    test_dl = DataLoader(test_set, 
-                          batch_size = BATCH_SIZE,
-                          shuffle = True, 
-                         )
-
-    criterion = cal_mpjpe
-
-    result = evaluate(model, test_dl, criterion)
-    print("Test MPJPE: {:.5f}".format(result))
+	with open(os.path.join(os.path.join(path, "data"), "data_test.pkl"), 'rb') as f:
+	    test_data = pickle.load(f)
+	model = training.LiftModel(2, 1024, 0.5)
+	model.load_state_dict(torch.load(os.path.join(os.path.join(path, "results"), 'bestModel.pt'), map_location = device))
+	print("Test")
+	training.run_epoch_weak(1,test_data, model, None, None,64, 'test')
