@@ -1,3 +1,0 @@
-Add your links here:
-vanilla GAN:
-cwGAN: 
