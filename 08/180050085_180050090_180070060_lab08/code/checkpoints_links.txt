@@ -1,0 +1,6 @@
+Add your links here:
+vanilla GAN checkpoint:	https://drive.google.com/file/d/1-4rMp-H8OPy0zOnqmrq0hyV797cmhckJ/view?usp=sharing
+vanilla GAN Notebook:	https://colab.research.google.com/drive/19ApcwbQsBCTP3U4kMhTgnoV-vbbTudhl?usp=sharing
+
+cwGAN checkpoint:		https://drive.google.com/file/d/11K3ms9oncUiFbzY0RAlgoRCDESc7Lvjk/view?usp=sharing
+cwGAN Notebook:			https://colab.research.google.com/drive/1S4hVDDgzCMKFC82RiXmZVcGxL7_3GAXD?usp=sharing
